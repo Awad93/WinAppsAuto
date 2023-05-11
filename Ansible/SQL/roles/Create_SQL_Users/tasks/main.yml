@@ -1,0 +1,35 @@
+- name: Create Domain Users
+  delegate_to: "{{DC}}"
+  community.windows.win_domain_user:
+    name: "{{item.name}}"
+    firstname: "{{item.firstname}}"
+    surname: "{{item.surname}}"
+    password: "{{item.password}}"
+    description: "{{item.description}}"
+    password_never_expires: yes
+    state: present
+    domain_username: "{{domain_admin_user}}"
+    domain_password: "{{domain_admin_password}}"
+    domain_server: "{{DC}}"
+  with_items: "{{ SQL_Users }}"
+
+- name: Add SQL Domain Accounts to Local Administrators
+  become: yes
+  win_group_membership:
+    name: Administrators
+    members:
+      - SQLSvc@{{dc_domain_name}}
+      - SQLReport@{{dc_domain_name}}
+    state: present
+
+- name: Set SPN for SQL Service Account
+  become: true
+  win_shell: >
+    setspn -S MSSQLSvc/SQL:1433 {{netbios_domain_name}}\SQLSvc &&
+    setspn -S MSSQLSvc/SQL.{{dc_domain_name}}:1433 {{netbios_domain_name}}\SQLSvc
+  args:
+    executable: cmd
+  vars:
+    ansible_become_user: "{{domain_admin_user}}"
+    ansible_become_pass: "{{domain_admin_password}}"
+  ignore_errors: true

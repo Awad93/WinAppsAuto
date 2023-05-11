@@ -1,0 +1,28 @@
+---
+- name: Config Windows DC
+  hosts: "{{DC}}"
+  gather_facts: false
+  become: yes
+  vars:
+    ansible_connection: winrm
+    ansible_port: 5985
+    ansible_become_method: runas
+    ansible_become_user: Administrator
+    ansible_become_password: "P@ssw0rd!"
+    ansible_user: Administrator
+    ansible_password: "P@ssw0rd!"
+    ansible_winrm_server_cert_validation: ignore
+    ansible_python_interpreter: /usr/bin/python
+
+    domain_netbios_name: "{{dc_domain_name.split('.')[0] | upper}}"
+    dc_domain_name:
+    safe_mode_password: "P@ssw0rd!"
+    domain_admin_user: "Administrator@{{dc_domain_name}}"
+    domain_admin_password: "P@ssw0rd!"
+    secondary_dns_server: 1.1.1.1
+  tags:
+    - Default
+  roles:
+    - AD_DNS_Setup
+    - DNS_Config
+

@@ -1,0 +1,28 @@
+
+- name: Check UCM exists
+  win_stat:
+    path: C:\temp\UcmaRuntimeSetup.exe
+  register: ucm_stat
+
+- name: Download UCM
+  win_get_url:
+    url: https://download.microsoft.com/download/2/C/4/2C47A5C1-A1F3-4843-B9FE-84C0032C61EC/UcmaRuntimeSetup.exe
+    dest: C:\temp\UcmaRuntimeSetup.exe
+    use_proxy: no
+    timeout: 300
+  when: ucm_stat.stat.exists == false
+
+- name: Run UCM installer
+  win_shell: UcmaRuntimeSetup.exe /q /norestart /log C:\temp\logucm.txt /x86 /x64 /redist
+  args:
+    chdir: C:\temp\
+    executable: cmd
+  register: UCM_install
+  become: yes
+  become_method: runas
+  vars:
+   ansible_become_user:  "{{domain_admin_user}}"
+   ansible_become_password: "{{domain_admin_password}}"
+
+- name: Reboot after Installation
+  win_reboot: ~

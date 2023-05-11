@@ -1,0 +1,43 @@
+
+- name: Check SQL Server 2017 ISO exists
+  win_stat:
+    path: C:\temp\sqlserver.iso
+  register: sqlserver_stat
+
+- name: Download SQL Server 2017 ISO
+  win_get_url:
+    url: https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLServer2017-x64-ENU.iso
+    dest: C:\temp\sqlserver.iso
+    use_proxy: no
+    timeout: 300
+  when: sqlserver_stat.stat.exists == false
+
+- name: Mount SQL Server ISO image
+  win_disk_image:
+    image_path: C:\temp\sqlserver.iso
+    state: present
+  register: SQL_Mounted_Path
+
+- name: Configure SQL Firewall for SQL Default Instance
+  community.windows.win_firewall_rule:
+    name: "{{item.name}}"
+    localport: "{{item.port}}"
+    action: "{{item.action}}"
+    direction: "{{item.dir}}"
+    protocol: "{{item.protocol}}"
+    state: present
+    enabled: yes
+  with_items: "{{Default_Firewall_Rules}}"
+
+- name: copy Default SQL Server Installation Configuration
+  win_copy:
+    src: config/STANDALONE.ini
+    dest: C:\temp\
+
+- name: Install Standalone Default SQL Instance
+  win_shell: setup.exe /IAcceptSQLServerLicenseTerms /ConfigurationFile=C:\temp\STANDALONE.ini
+  args:
+    chdir: "{{SQL_Mounted_Path.mount_paths[0]}}"
+    executable: cmd
+  register: SQL_Install
+

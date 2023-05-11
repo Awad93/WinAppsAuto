@@ -1,0 +1,29 @@
+- name: Install and configure Exchange server
+  hosts: "{{EXCH}}"
+  become: true
+  gather_facts: false
+  vars_files:
+    - vars.yml
+  vars:
+    ansible_connection: winrm
+    ansible_port: 5985
+    ansible_become_method: runas
+    ansible_become_user: Administrator
+    ansible_become_password: "P@ssw0rd!"
+    ansible_user: Administrator
+    ansible_password: "P@ssw0rd!"
+    ansible_winrm_server_cert_validation: ignore
+    ansible_python_interpreter: /usr/bin/python
+
+    DC:
+    dc_domain_name:
+    netbios_domain_name: "{{dc_domain_name.split('.')[0] | upper}}"
+
+
+  roles:
+  - Join_Domain
+  - Install_.Net
+  - Install_UCM
+  - Install_win_fet
+  - Install_C++
+  - Install_Exchange

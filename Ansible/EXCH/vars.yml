@@ -1,0 +1,4 @@
+
+secondary_dns_server: 1.1.1.1
+domain_admin_user: "Administrator@{{dc_domain_name}}"
+domain_admin_password: "P@ssw0rd!"

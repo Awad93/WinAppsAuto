@@ -1,0 +1,26 @@
+- name: Reboot after installing all SQL Server instances
+  win_reboot:
+
+- name: Check SQL Server 2017 CU exists
+  win_stat:
+    path: C:\temp\sqlservercu.exe
+  register: sqlservercu_stat
+
+- name: Download SQL Server CU
+  win_get_url:
+    url: https://download.microsoft.com/download/C/4/F/C4F908C9-98ED-4E5F-88D5-7D6A5004AEBD/SQLServer2017-KB5016884-x64.exe
+    dest: C:\temp\sqlservercu.exe
+    use_proxy: no
+    timeout: 300
+  when: sqlservercu_stat.stat.exists == false
+
+- name: Install CU28 for SQL Server
+  win_shell: sqlservercu.exe /QUIET /IACCEPTSQLSERVERLICENSETERMS /Action=Patch /ALLINSTANCES
+  args:
+    chdir: C:\temp
+    executable: cmd
+  register: SQL_CU_install
+  ignore_errors: True
+
+- name: Reboot after installing SQL Updates
+  win_reboot:

@@ -1,0 +1,21 @@
+
+secondary_dns_server: 1.1.1.1
+domain_admin_user: "Administrator@{{dc_domain_name}}"
+domain_admin_password: "P@ssw0rd!"
+SQL_Users:
+  - {name: SQLSvc, firstname: SQL, surname: Service, password: P@ssw0rd!, description: SQL Service Account}
+  - {name: SQLReport, firstname: SQL Reporting, surname: Service, password: P@ssw0rd!, description: Domain user account for use with reporting services User}
+
+Firewall_Rules:
+  - {name: SQL Service Broker, dir: in, action: allow, protocol: tcp, port: 4022}
+  - {name: SQL Debugger/RPC, dir: in, action: allow, protocol: tcp, port: 135}
+  - {name: SQL Browser Button, dir: in, action: allow, protocol: udp, port: 1434}
+
+SP_Firewall_Rules:
+  - {name: SP SQL Server, dir: in, action: allow, protocol: tcp, port: 1435}
+
+SCCM_Firewall_Rules:
+  - {name: SCCM SQL Server, dir: in, action: allow, protocol: tcp, port: 1436}
+
+Default_Firewall_Rules:
+  - {name: SQL Server, dir: in, action: allow, protocol: tcp, port: 1433}

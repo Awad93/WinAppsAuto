@@ -1,0 +1,9 @@
+- name: Copy Configure_SQL_Network script to SQL
+  win_copy:
+    src: scripts/Configure_SQL_Network.ps1
+    dest: C:\temp\
+
+- name: Configure SQL Network
+  ansible.windows.win_powershell:
+    script: .\Configure_SQL_Network.ps1
+    chdir: C:\temp\

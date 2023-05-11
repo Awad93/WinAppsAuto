@@ -1,0 +1,41 @@
+
+- name: Download Dotnet Framework 4.8
+  win_get_url:
+    url: https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/9b7b8746971ed51a1770ae4293618187/ndp48-web.exe
+    dest: C:\temp\ndp48.exe
+    use_proxy: no
+    timeout: 300
+
+- name: Install Dotnet Framework 4.8
+  win_shell: ndp48.exe /q /norestart /log C:\temp\ndp48.log
+  args:
+    chdir: C:\temp
+    executable: cmd
+  register: dotnet48_Install
+  ignore_errors: True
+
+- name: Reboot after installing dotent framework 4.8
+  win_reboot:
+
+- name: Check SSMS exists
+  win_stat:
+    path: C:\temp\SSMS-Setup-ENU.exe
+  register: ssms_stat
+
+- name: Download SQL Server Management Studio
+  win_get_url:
+    url: https://download.microsoft.com/download/9/f/8/9f8197f4-0f71-42a3-8717-b2817c77b820/SSMS-Setup-ENU.exe
+    dest: C:\temp\SSMS-Setup-ENU.exe
+    use_proxy: no
+    timeout: 300
+  when: ssms_stat.stat.exists == false
+
+- name: Install SSMS
+  win_shell: SSMS-Setup-ENU.exe /install /quiet /norestart /log ssms.log
+  args:
+    chdir: C:\temp
+    executable: cmd
+  register: SSMS_Install
+
+- name: Reboot after SSMS Installation
+  win_reboot:

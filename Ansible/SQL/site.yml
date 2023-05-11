@@ -1,0 +1,62 @@
+- name: Install and Configure SQL Server
+  hosts: "{{SQL}}"    # VM IP to be Provisioned
+  become: true
+  gather_facts: false
+  vars_files:
+    - vars.yml
+  vars:
+    ansible_connection: winrm
+    ansible_port: 5985
+    ansible_become_method: runas
+    ansible_become_user: Administrator
+    ansible_become_password: "P@ssw0rd!"
+    ansible_user: Administrator
+    ansible_password: "P@ssw0rd!"
+    ansible_winrm_server_cert_validation: ignore
+    ansible_python_interpreter: /usr/bin/python
+    # Required Parameters
+    DC:                           # Domain Controller IP
+    dc_domain_name:               # Domain Name e.g. banana.local
+    netbios_domain_name: "{{dc_domain_name.split('.')[0] | upper}}"
+
+  tags:
+    - Default
+  roles:
+    - Join_Domain
+    - Create_SQL_Users
+    - Prepare_SQL_Install
+    - Install_SQL_Server_Instances
+    - Install_SQL_Updates
+    - Install_SSMS
+    - Install_SSRS
+    - Configure_SQL Server
+    - Cleanup
+
+
+- name: Install and Configure SQL Server
+  hosts: "{{SQL}}"
+  become: true
+  gather_facts: false
+  vars_files:
+    - vars.yml
+  vars:
+    ansible_connection: winrm
+    ansible_port: 5985
+    ansible_become_method: runas
+    ansible_become_user: Administrator
+    ansible_become_password: "P@ssw0rd!"
+    ansible_user: Administrator
+    ansible_password: "P@ssw0rd!"
+    ansible_winrm_server_cert_validation: ignore
+    ansible_python_interpreter: /usr/bin/python
+
+  tags:
+    - Standalone
+  roles:
+    - Prepare_SQL_Install
+    - Install_Standalone_Default_Instance
+    - Install_SQL_Updates
+    - Install_SSMS
+    - Configure_SQL Server
+    - Cleanup
+

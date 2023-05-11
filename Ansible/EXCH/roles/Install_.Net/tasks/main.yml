@@ -1,0 +1,19 @@
+
+- name: Create Temp Directory
+  ansible.windows.win_file:
+    path: C:\temp
+    state: directory
+
+- name: Download Dotnet Framework 4.8
+  win_get_url:
+    url: https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/9b7b8746971ed51a1770ae4293618187/ndp48-web.exe
+    dest: C:\temp\ndp48.exe
+    use_proxy: no
+    timeout: 300
+
+- name: Run Microsoft .NET Framework 4.6.1 installer
+  raw: C:\temp\ndp48.exe /q /norestart /log C:\temp\log.txt /x86 /x64 /redist
+  register: dotnet_install
+
+- name: Reboot as required by Microsoft .NET Frame
+  win_reboot: ~

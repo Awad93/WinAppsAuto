@@ -1,0 +1,13 @@
+- name: Unmount SQL Server ISO image
+  win_disk_image:
+    image_path: C:\temp\sqlserver.iso
+    state: absent
+  ignore_errors: true
+
+- name: Cleanup
+  ansible.windows.win_file:
+    path: C:\temp
+    state: absent
+
+- name: Last Reboot
+  win_reboot:

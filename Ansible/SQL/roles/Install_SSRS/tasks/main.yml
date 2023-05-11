@@ -1,0 +1,24 @@
+- name: Check SSRS exists
+  win_stat:
+    path: C:\temp\ssrs.exe
+  register: ssrs_stat
+
+- name: Download SQL Reporting Service
+  win_get_url:
+    url: https://download.microsoft.com/download/E/6/4/E6477A2A-9B58-40F7-8AD6-62BB8491EA78/SQLServerReportingServices.exe
+    dest: C:\temp\ssrs.exe
+    use_proxy: no
+    timeout: 300
+  register: SQLR
+  when: ssrs_stat.stat.exists == false
+
+- name: Install SQL Reporting Service
+  become: yes
+  win_shell: 'ssrs.exe /quiet /norestart /IAcceptLicenseTerms /Edition=Eval /log C:\temp\ssrs.log'
+  args:
+    chdir: C:\temp
+    executable: cmd
+  register: SSRS_install
+
+- name: Reboot after SSRS Installation
+  win_reboot:
